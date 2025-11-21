@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试页面</title>
+    <style>
+        .word-item { background: blue; color: white; padding: 10px; margin: 5px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>简单测试</h1>
+    <div id="wordsGrid"></div>
+    
+    <script>
+        // 简单的字词测试
+        const words = ['月光', '星辰', '大海', '山川', '云朵', '落叶'];
+        const container = document.getElementById('wordsGrid');
+        
+        words.forEach(word => {
+            const div = document.createElement('div');
+            div.className = 'word-item';
+            div.textContent = word;
+            container.appendChild(div);
+        });
+        
+        console.log('测试页面加载完成');
+    </script>
+</body>
+</html>

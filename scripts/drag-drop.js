@@ -1,70 +1,72 @@
-// 拖拽排序功能
-class DragDropManager {
-    constructor(container) {
-        this.container = container;
-        this.draggedItem = null;
-        this.init();
-    }
+// 字词级别拖拽排序功能
+// 检查是否已经存在，避免重复声明
+if (typeof DragDropManager === 'undefined') {
+    class DragDropManager {
+        constructor(container) {
+            this.container = container;
+            this.draggedWord = null;
+            console.log('拖拽管理器初始化');
+            this.init();
+        }
 
-    init() {
-        this.container.addEventListener('dragstart', this.handleDragStart.bind(this));
-        this.container.addEventListener('dragover', this.handleDragOver.bind(this));
-        this.container.addEventListener('drop', this.handleDrop.bind(this));
-        this.container.addEventListener('dragend', this.handleDragEnd.bind(this));
-    }
+        init() {
+            this.container.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('poetry-word')) {
+                    console.log('开始拖拽:', e.target.textContent);
+                    this.draggedWord = e.target;
+                    e.target.style.opacity = '0.5';
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
 
-    // 改进：添加拖拽视觉反馈
-    handleDragStart(e) {
-        if (e.target.classList.contains('poetry-line')) {
-            this.draggedItem = e.target;
-            e.target.classList.add('dragging');
-            e.target.style.transform = 'rotate(2deg)'; // 视觉反馈
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', e.target.innerHTML);
+            this.container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const targetWord = e.target.closest('.poetry-word');
+                const currentLine = e.target.closest('.poetry-line');
+                if (this.draggedWord && currentLine) {
+                    if (targetWord && targetWord !== this.draggedWord) {
+                        const rect = targetWord.getBoundingClientRect();
+                        const midPoint = rect.left + rect.width / 2;
+                        const reference = (e.clientX < midPoint) ? targetWord : targetWord.nextSibling;
+                        currentLine.insertBefore(this.draggedWord, reference);
+                    } else {
+                        currentLine.appendChild(this.draggedWord);
+                    }
+                }
+            });
+
+            this.container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('.poetry-word');
+                const line = e.target.closest('.poetry-line');
+                
+                if (this.draggedWord && line) {
+                    console.log('放置到:', target ? target.textContent : '行末尾');
+                    if (target && target !== this.draggedWord) {
+                        target.parentNode.insertBefore(this.draggedWord, target);
+                    } else {
+                        line.appendChild(this.draggedWord);
+                    }
+                    this.draggedWord.style.opacity = '1';
+                    this.draggedWord = null;
+                    
+                    // 触发保存
+                    if (window.poetryApp) {
+                        window.poetryApp.saveToLocalStorage();
+                    }
+                }
+            });
+
+            this.container.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('poetry-word')) {
+                    console.log('拖拽结束');
+                    e.target.style.opacity = '1';
+                    this.draggedWord = null;
+                }
+            });
         }
     }
-
-    handleDragEnd(e) {
-        if (e.target.classList.contains('poetry-line')) {
-            e.target.classList.remove('dragging');
-            e.target.style.transform = ''; // 恢复原状
-        }
-    }
-
-    handleDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        
-        const afterElement = this.getDragAfterElement(this.container, e.clientY);
-        const draggable = document.querySelector('.dragging');
-        
-        if (afterElement == null) {
-            this.container.appendChild(draggable);
-        } else {
-            this.container.insertBefore(draggable, afterElement);
-        }
-    }
-
-    handleDrop(e) {
-        e.preventDefault();
-        if (this.draggedItem) {
-            this.draggedItem.classList.remove('dragging');
-            this.draggedItem = null;
-        }
-    }
-
-    getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.poetry-line:not(.dragging)')];
-        
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
+    
+    // 导出到全局作用域
+    window.DragDropManager = DragDropManager;
 }

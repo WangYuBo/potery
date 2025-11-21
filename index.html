@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <script src="scripts/word-bank.js"></script>
-<script src="scripts/drag-drop.js"></script>
-<script src="scripts/app.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +29,6 @@
             <!-- 随机字词区 -->
             <section class="words-area">
                 <h3>可选字词</h3>
-                <!-- 确保这个div的id是wordsGrid -->
                 <div class="words-grid" id="wordsGrid">
                     <!-- 字词将通过JavaScript动态生成 -->
                 </div>
@@ -41,7 +37,7 @@
         </main>
 
         <footer class="footer">
-            <p>© 2024 现代诗生成器 | 使用 GitHub Pages 部署</p>
+            <p>© 2024 现代诗生成器</p>
         </footer>
     </div>
 
@@ -49,7 +45,6 @@
     <div id="message" class="message hidden"></div>
 
     <!-- 确保依赖顺序：先加载字词库，再加载应用逻辑 -->
-    <!-- 在body标签的底部，确保这个顺序 -->
     <script src="scripts/word-bank.js"></script>
     <script src="scripts/drag-drop.js"></script>
     <script src="scripts/app.js"></script>
