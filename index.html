@@ -48,6 +48,8 @@
     <!-- 消息提示 -->
     <div id="message" class="message hidden"></div>
 
+    <!-- 确保依赖顺序：先加载字词库，再加载应用逻辑 -->
+    <!-- 在body标签的底部，确保这个顺序 -->
     <script src="scripts/word-bank.js"></script>
     <script src="scripts/drag-drop.js"></script>
     <script src="scripts/app.js"></script>
